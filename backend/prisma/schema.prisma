@@ -4,12 +4,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
   firstName String
@@ -24,14 +24,14 @@ model User {
 }
 
 model Room {
-  id          String   @id @default(cuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
   type        RoomType
   price       Float
   capacity    Int
-  amenities   Json // JSON array of amenities
-  images      Json // JSON array of image URLs
+  amenities   String[] // Array of amenities
+  images      String[] // Array of image URLs
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -42,7 +42,7 @@ model Room {
 }
 
 model Booking {
-  id          String       @id @default(cuid())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   checkIn     DateTime
   checkOut    DateTime
   totalAmount Float
@@ -52,10 +52,10 @@ model Booking {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  userId String
+  userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  roomId String
+  roomId String @db.ObjectId
   room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   payment Payment?
@@ -64,13 +64,13 @@ model Booking {
 }
 
 model Payment {
-  id          String      @id @default(cuid())
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   amount      Float
   status      PaymentStatus @default(PENDING)
   paymentIntentId String? // PayHere payment intent ID
   createdAt   DateTime    @default(now())
 
-  bookingId String   @unique
+  bookingId String   @unique @db.ObjectId
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("payments")

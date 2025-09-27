@@ -1,6 +1,6 @@
 # ISARA Guest House - Backend API
 
-A NestJS backend API for the ISARA Guest House Management System, built with TypeScript, Prisma ORM, and PlanetScale MySQL database.
+A NestJS backend API for the ISARA Guest House Management System, built with TypeScript, Prisma ORM, and MongoDB Atlas database.
 
 ## Features
 
@@ -9,13 +9,13 @@ A NestJS backend API for the ISARA Guest House Management System, built with Typ
 - **Room Management**: CRUD operations for hotel rooms
 - **Booking System**: Room booking and reservation management
 - **Payment Integration**: PayHere payment gateway integration
-- **Database**: PlanetScale MySQL with Prisma ORM
+- **Database**: MongoDB Atlas with Prisma ORM
 
 ## Tech Stack
 
 - **Framework**: NestJS
 - **Language**: TypeScript
-- **Database**: PlanetScale (MySQL)
+- **Database**: MongoDB Atlas
 - **ORM**: Prisma
 - **Authentication**: JWT with Passport
 - **Validation**: class-validator
@@ -26,7 +26,7 @@ A NestJS backend API for the ISARA Guest House Management System, built with Typ
 ### Prerequisites
 
 - Node.js 18+
-- PlanetScale account
+- MongoDB Atlas account
 - PayHere merchant account
 
 ### Installation
@@ -49,7 +49,7 @@ A NestJS backend API for the ISARA Guest House Management System, built with Typ
 
    Update the `.env` file with your configuration:
    ```env
-   DATABASE_URL="mysql://username:password@host:port/database"
+   DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority"
    JWT_SECRET="your-super-secret-jwt-key"
    FRONTEND_URL="http://localhost:3000"
    ```
