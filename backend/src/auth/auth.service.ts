@@ -1,26 +1,40 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../common/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
-    // TODO: Implement with database
+    // Check if user already exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    
-    // Mock user creation
-    const user = {
-      id: '1',
-      email: registerDto.email,
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      role: 'GUEST',
-      password: hashedPassword,
-    };
+
+    // Create user
+    const user = await this.prisma.user.create({
+      data: {
+        email: registerDto.email,
+        password: hashedPassword,
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+        role: 'GUEST',
+      },
+    });
 
     const payload = { email: user.email, sub: user.id, role: user.role };
     const token = this.jwtService.sign(payload);
@@ -38,37 +52,32 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // TODO: Implement with database
-    // Mock user lookup
-    const mockUser = {
-      id: '1',
-      email: 'admin@isara.com',
-      password: await bcrypt.hash('admin', 10),
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'ADMIN',
-    };
+    // Find user by email
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginDto.email },
+    });
 
-    if (loginDto.email !== mockUser.email) {
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, mockUser.password);
+    // Check password
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { email: mockUser.email, sub: mockUser.id, role: mockUser.role };
+    const payload = { email: user.email, sub: user.id, role: user.role };
     const token = this.jwtService.sign(payload);
 
     return {
       access_token: token,
       user: {
-        id: mockUser.id,
-        email: mockUser.email,
-        firstName: mockUser.firstName,
-        lastName: mockUser.lastName,
-        role: mockUser.role,
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
       },
     };
   }

@@ -1,23 +1,161 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ISARA Guest House - Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS backend API for the ISARA Guest House Management System, built with TypeScript, Prisma ORM, and PlanetScale MySQL database.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
+## Features
+
+- **Authentication & Authorization**: JWT-based authentication with role-based access control
+- **User Management**: Guest and admin user management
+- **Room Management**: CRUD operations for hotel rooms
+- **Booking System**: Room booking and reservation management
+- **Payment Integration**: PayHere payment gateway integration
+- **Database**: PlanetScale MySQL with Prisma ORM
+
+## Tech Stack
+
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PlanetScale (MySQL)
+- **ORM**: Prisma
+- **Authentication**: JWT with Passport
+- **Validation**: class-validator
+- **Password Hashing**: bcrypt
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- PlanetScale account
+- PayHere merchant account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd guest-house-platform/backend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   ```
+
+   Update the `.env` file with your configuration:
+   ```env
+   DATABASE_URL="mysql://username:password@host:port/database"
+   JWT_SECRET="your-super-secret-jwt-key"
+   FRONTEND_URL="http://localhost:3000"
+   ```
+
+4. **Database Setup**
+   ```bash
+   # Generate Prisma client
+   npm run prisma:generate
+
+   # Push schema to database
+   npm run prisma:push
+
+   # Seed the database
+   npm run prisma:seed
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run start:dev
+   ```
+
+The API will be available at `http://localhost:3000`
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/register` - User registration
+- `POST /auth/login` - User login
+- `POST /auth/refresh` - Refresh JWT token
+- `POST /auth/logout` - User logout
+
+### Rooms
+- `GET /rooms` - Get all available rooms
+- `GET /rooms/:id` - Get room details
+
+### Users (Protected)
+- `GET /users/profile` - Get user profile
+- `PUT /users/profile` - Update user profile
+
+### Admin Endpoints (Admin role required)
+- `GET /admin/users` - List all users
+- `GET /admin/bookings` - List all bookings
+- `POST /admin/rooms` - Create new room
+- `PUT /admin/rooms/:id` - Update room
+- `DELETE /admin/rooms/:id` - Delete room
+
+## Database Schema
+
+The application uses the following main entities:
+
+- **User**: Guest and admin users
+- **Room**: Hotel room information
+- **Booking**: Room reservations
+- **Payment**: Payment transactions
+
+See `prisma/schema.prisma` for the complete database schema.
+
+## Scripts
+
+- `npm run start:dev` - Start development server
+- `npm run build` - Build for production
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:push` - Push schema changes to database
+- `npm run prisma:seed` - Seed database with initial data
+- `npm run test` - Run tests
+
+## Project Structure
+
+```
+src/
+├── auth/                 # Authentication module
+├── users/                # User management
+├── rooms/                # Room management
+├── bookings/             # Booking system
+├── payments/             # Payment processing
+├── common/               # Shared utilities
+│   ├── guards/          # Auth guards
+│   ├── decorators/      # Custom decorators
+│   ├── prisma.service.ts # Database service
+│   └── jwt.strategy.ts  # JWT strategy
+├── config/              # Configuration files
+└── main.ts              # Application entry point
+
+prisma/
+├── schema.prisma        # Database schema
+└── seed.ts             # Database seeding
+```
+
+## Deployment
+
+The backend is configured for deployment to Railway or Render with the following considerations:
+
+- Environment variables for database connection
+- CORS configuration for frontend domain
+- Production builds with `npm run build`
+
+## Contributing
+
+1. Follow the existing code structure
+2. Add proper validation and error handling
+3. Update tests for new features
+4. Ensure all endpoints are properly documented
+
+## License
+
+This project is part of the ISARA Guest House Management System.
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
